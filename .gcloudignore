@@ -1,0 +1,9 @@
+.gcloudignore
+.git
+.venv
+.idea
+__pycache__
+*.pyc
+dist
+*.whl
+upload

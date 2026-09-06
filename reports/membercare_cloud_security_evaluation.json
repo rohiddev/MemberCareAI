@@ -1,0 +1,74 @@
+{
+  "api_url": "https://membercare-api-422936875002.us-central1.run.app",
+  "approval_id": "approval-68baef300acaa933ffacecbc",
+  "execution_mode": "SIMULATED",
+  "passed": 9,
+  "failed": 0,
+  "total": 9,
+  "pass_rate": 1.0,
+  "results": [
+    {
+      "name": "pending_approval_cannot_execute",
+      "passed": true,
+      "expected_status": 409,
+      "actual_status": 409,
+      "detail": "Approval request is not approved. Current status: PENDING_APPROVAL."
+    },
+    {
+      "name": "member_cannot_review",
+      "passed": true,
+      "expected_status": 401,
+      "actual_status": 401,
+      "detail": "Invalid reviewer authentication token"
+    },
+    {
+      "name": "executor_cannot_review",
+      "passed": true,
+      "expected_status": 401,
+      "actual_status": 401,
+      "detail": "Invalid reviewer authentication token"
+    },
+    {
+      "name": "member_cannot_execute",
+      "passed": true,
+      "expected_status": 401,
+      "actual_status": 401,
+      "detail": "Invalid executor authentication token"
+    },
+    {
+      "name": "reviewer_cannot_execute",
+      "passed": true,
+      "expected_status": 401,
+      "actual_status": 401,
+      "detail": "Invalid executor authentication token"
+    },
+    {
+      "name": "reviewer_can_approve_pending_request",
+      "passed": true,
+      "expected_status": 200,
+      "actual_status": 200,
+      "detail": "The human review decision was recorded. No external action has been executed."
+    },
+    {
+      "name": "approval_cannot_be_decided_twice",
+      "passed": true,
+      "expected_status": 409,
+      "actual_status": 409,
+      "detail": "Approval request is no longer pending. Current status: APPROVED."
+    },
+    {
+      "name": "executor_can_execute_approved_request",
+      "passed": true,
+      "expected_status": 200,
+      "actual_status": 200,
+      "detail": "Approved action executed through MCP."
+    },
+    {
+      "name": "completed_request_cannot_execute_twice",
+      "passed": true,
+      "expected_status": 409,
+      "actual_status": 409,
+      "detail": "Approval request is not eligible for execution. Current execution status: COMPLETED."
+    }
+  ]
+}

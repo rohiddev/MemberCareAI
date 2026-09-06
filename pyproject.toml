@@ -1,0 +1,71 @@
+[project]
+name = "membercareai"
+version = "0.1.0"
+description = "Governed multi-agent healthcare member experience platform"
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    "google-adk[gcp]>=2.0.0,<3.0.0",
+    "google-cloud-aiplatform[agent_engines,adk]>=1.112",
+    "google-cloud-firestore>=2.28.1",
+    "google-genai",
+    "cloudpickle",
+    "pydantic",
+    "fastapi",
+    "uvicorn",
+    "opentelemetry-api",
+    "opentelemetry-sdk",
+    "opentelemetry-exporter-gcp-trace",
+    "pandas>=3.0.5",
+    "mcp[cli]>=2.0.0,<3.0.0",
+    "google-cloud-logging>=3.16.3",
+]
+
+
+[project.scripts]
+membercareai = "membercare_app.api:main"
+
+
+[build-system]
+requires = [
+    "uv_build>=0.12.5,<0.13.0",
+]
+build-backend = "uv_build"
+
+
+# ============================================================
+# UV BUILD CONFIGURATION
+# ============================================================
+#
+# MemberCareAI uses a flat package layout:
+#
+# MemberCareAI/
+# ├── app/
+# ├── scripts/
+# ├── data/
+# └── pyproject.toml
+#
+# uv_build normally expects a src/ layout and normally derives
+# the Python module name from the project name.
+#
+# Our actual import package is:
+#
+#     app
+#
+# Therefore:
+#
+#     module-root = ""
+#
+# tells uv_build that packages live directly under the project
+# root.
+#
+#     module-name = "app"
+#
+# tells uv_build to package app/ rather than creating only a
+# membercareai/ package.
+# ============================================================
+
+[tool.uv.build-backend]
+module-root = ""
+module-name = "membercare_app"
