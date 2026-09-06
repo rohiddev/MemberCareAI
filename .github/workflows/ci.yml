@@ -1,74 +1,49 @@
-mkdir -p .github/workflows
-touch .github/workflows/ci.yml
-(membercareai) chandinidev@Chandinis-Air MemberCareAI % sed -n '1,220p' pyproject.toml
-[project]
-name = "membercareai"
-version = "0.1.0"
-description = "Governed multi-agent healthcare member experience platform"
-readme = "README.md"
-requires-python = ">=3.12"
+name: MemberCareAI CI
 
-dependencies = [
-    "google-adk[gcp]>=2.0.0,<3.0.0",
-    "google-cloud-aiplatform[agent_engines,adk]>=1.112",
-    "google-cloud-firestore>=2.28.1",
-    "google-genai",
-    "cloudpickle",
-    "pydantic",
-    "fastapi",
-    "uvicorn",
-    "opentelemetry-api",
-    "opentelemetry-sdk",
-    "opentelemetry-exporter-gcp-trace",
-    "pandas>=3.0.5",
-    "mcp[cli]>=2.0.0,<3.0.0",
-    "google-cloud-logging>=3.16.3",
-]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 
+permissions:
+  contents: read
 
-[project.scripts]
-membercareai = "membercare_app.api:main"
+jobs:
+  validate:
+    name: Validate MemberCareAI
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
 
+    env:
+      GOOGLE_GENAI_USE_VERTEXAI: "true"
+      GOOGLE_CLOUD_PROJECT: "ci-validation-project"
+      GOOGLE_CLOUD_LOCATION: "us-central1"
+      KNOWLEDGE_BACKEND: "vertex"
 
-[build-system]
-requires = [
-    "uv_build>=0.12.5,<0.13.0",
-]
-build-backend = "uv_build"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
 
-# ============================================================
-# UV BUILD CONFIGURATION
-# ============================================================
-#
-# MemberCareAI uses a flat package layout:
-#
-# MemberCareAI/
-# ├── app/
-# ├── scripts/
-# ├── data/
-# └── pyproject.toml
-#
-# uv_build normally expects a src/ layout and normally derives
-# the Python module name from the project name.
-#
-# Our actual import package is:
-#
-#     app
-#
-# Therefore:
-#
-#     module-root = ""
-#
-# tells uv_build that packages live directly under the project
-# root.
-#
-#     module-name = "app"
-#
-# tells uv_build to package app/ rather than creating only a
-# membercareai/ package.
-# ============================================================
+      - name: Install Python
+        run: uv python install 3.12
 
-[tool.uv.build-backend]
-module-root = ""
-module-name = "membercare_app"
+      - name: Synchronize dependencies
+        run: uv sync --frozen
+
+      - name: Compile Python files
+        run: uv run python -m compileall -q membercare_app membercare_mcp scripts
+
+      - name: Build package
+        run: uv build
+
+      - name: Show build artifacts
+        run: ls -lh dist
